@@ -1,4 +1,4 @@
-# 
+# thursday
 Jarvis/Friday type AI home assistant.
 
 The AI portion is to be hosted on a python flask server,
