@@ -1,34 +1,13 @@
-import speech_recognition
-from chatterbot import ChatBot
-import nltk
-nltk.download('punkt')
+from flask import Flask, Response, request
 
-recognize = speech_recognition.Recognizer()
-bot = ChatBot("")
+app = Flask(__name__)
 
 
-def listen(recognizer):
-    tts = ""
-    try:
-        with speech_recognition.Microphone() as mic:
-            audio = recognizer.listen(mic)
-            tts = recognizer.recognize_google(audio)
-            print(tts)
-    except speech_recognition.UnknownValueError:
-        print("Sorry, I didn't get that. Could you try again?")
-    except speech_recognition.RequestError:
-        print("Sorry, my speech service is down.")
-    return tts
+@app.route('/', methods=['POST'])
+def get_data():
+    print(request.data)
+    return Response('We recieved something…')
 
 
-while True:
-    listener = listen(recognize)
-    if "friday" in listener.lower():
-        print(listener)
-        try:
-            bot_input = bot.get_response(listener)
-            print(bot_input)
-
-        except(KeyboardInterrupt, EOFError, SystemExit):
-            print("err")
-            break
+if __name__ == '__main__':
+    app.run()
