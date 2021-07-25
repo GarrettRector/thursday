@@ -1,8 +1,10 @@
+import secrets
 from flask import Flask, Response, request, session
 from ai import ask, append_interaction_to_chat_log
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '89djhff9lhkd93'
+secret_key = secrets.token_hex(16)
+app.config['SECRET_KEY'] = secret_key
 
 
 @app.route('/', methods=['POST'])
