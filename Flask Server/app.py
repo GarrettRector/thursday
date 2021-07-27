@@ -9,12 +9,9 @@ app.config['SECRET_KEY'] = secret_key
 
 @app.route('/', methods=['POST'])
 def get_data():
-    question = request.data
-    question = str(question)
-    print(question)
+    question = request.data.decode("UTF-8")
     chat_log = session.get('chat_log')
     answer = ask(question, chat_log)
-    print(answer)
     session['chat_log'] = append_interaction_to_chat_log(question, answer, chat_log)
     return Response(answer)
 

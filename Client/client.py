@@ -22,19 +22,25 @@ def listen(recognizer):
             print(tts)
     # exception handling for tts errors
     except speech_recognition.UnknownValueError:
-        err = "Sorry, I didn't get that. Could you try again?"
         texttospeech("valerr")
     except speech_recognition.RequestError:
-        err = "Sorry, my speech service is down."
         texttospeech("down")
     except http.client.IncompleteRead:
-        err = "an error has occured"
         texttospeech("inc")
     return tts
 
 
 def texttospeech(name):
     playsound(f"{name}.mp3")
+
+
+#
+def ttsgen(texts):
+    fil = gTTS(text=texts, lang="en", slow=False)
+    fil.save(f"response.mp3")
+    texttospeech("response")
+    time.sleep(len(response) * 0.7)
+    os.remove(f"response.mp3")
 
 
 # main function
@@ -45,9 +51,10 @@ while True:
         config.read('config.properties')
         r = requests.post(config.get("address", "address"), listener)
         response = r.text
-        print(response)
-        files = gTTS(text=response, lang="en", slow=False)
-        files.save(f"response.mp3")
-        playsound(f"response.mp3")
-        time.sleep(len(response) * 0.7)
-        os.remove(f"response.mp3")
+        if response != "":
+            print(response)
+            tts(response)
+        else:
+            text = "Sorry, my AI response server is offline right now. Please try again later"
+            tts(text)
+            exit()
