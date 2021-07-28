@@ -15,6 +15,7 @@ recognize = speech_recognition.Recognizer()
 
 def listen(recognizer):
     tts = ""
+    def texttospeech(name): playsound(f"{name}.mp3")
     try:
         with speech_recognition.Microphone() as mic:
             audio = recognizer.listen(mic)
@@ -30,15 +31,10 @@ def listen(recognizer):
     return tts
 
 
-def texttospeech(name):
-    playsound(f"{name}.mp3")
-
-
-#
 def ttsgen(texts):
     fil = gTTS(text=texts, lang="en", slow=False)
     fil.save(f"response.mp3")
-    texttospeech("response")
+    playsound(f"response.mp3")
     time.sleep(len(response) * 0.7)
     os.remove(f"response.mp3")
 
@@ -53,8 +49,8 @@ while True:
         response = r.text
         if response != "":
             print(response)
-            tts(response)
+            ttsgen(response)
         else:
             text = "Sorry, my AI response server is offline right now. Please try again later"
-            tts(text)
+            ttsgen(text)
             exit()
