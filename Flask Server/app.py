@@ -9,9 +9,12 @@ def get_data():
     question = request.data.decode("UTF-8")
     with open("chatlog.txt", "r") as file:
         chat_log = file.read()
-    print(chat_log)
-    answer = ask(question, chat_log)
-    print(answer)
+    while True:
+        answer = ask(question, chat_log)
+        if answer == "":
+            pass
+        else:
+            break
     append_chat_log(question, answer, chat_log)
     return Response(answer)
 

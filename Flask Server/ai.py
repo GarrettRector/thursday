@@ -3,19 +3,18 @@ import openai
 
 config = configparser.ConfigParser()
 config.read('key.properties')
-
 openai.api_key = config.get("key", "key")
 completion = openai.Completion()
 
 start_sequence = "\nThursday:"
-restart_sequence = "\n\nPerson:"
+restart_sequence = "\nPerson:"
 
 
 def ask(question, chat_log):
-    prompt_text = f'{chat_log}{restart_sequence}: {question}{start_sequence}:'
-    print(prompt_text)
+    print(question)
+    prompt_text = f'{chat_log}{restart_sequence} {question}{start_sequence}:'
     response = openai.Completion.create(
-        engine="curie",
+        engine="babbage",
         prompt=prompt_text,
         temperature=0.8,
         max_tokens=150,
@@ -24,9 +23,12 @@ def ask(question, chat_log):
         presence_penalty=0.3,
         stop=["\n"],
     )
-    story = response['choices'][0]['text']
-    return str(story)
+    response = response['choices'][0]['text']
+    response = str(response)
+    print(response)
+    return response
 
 
 def append_chat_log(question, answer, chat_log):
-    return f'{chat_log}{restart_sequence} {question}{start_sequence}{answer}'
+    with open("chatlog.txt", "w") as file:
+        file.write(f'{chat_log}{restart_sequence} {question}{start_sequence}{answer}')
