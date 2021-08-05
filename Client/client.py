@@ -14,7 +14,6 @@ recognize = speech_recognition.Recognizer()
 
 
 def listen(recognizer):
-    tts = None
     try:
         with speech_recognition.Microphone() as mic:
             audio = recognizer.listen(mic)
@@ -45,27 +44,36 @@ def ttsgen(texts):
     os.remove(f"response.mp3")
 
 
+def request(listener):
+    config = configparser.ConfigParser()
+    config.read('config.properties')
+    r = requests.post(config.get("address", "address"), listener)
+    response = r.text
+    if response != "":
+        print(f"thursday > {response}")
+        ttsgen(response)
+    else:
+        text = "Sorry, my AI response server is offline right now. Please try again later"
+        ttsgen(text)
+        exit()
+
+
 # main function
-while True:
+def main():
     listener = listen(recognize)
     if listener is not None:
-        if "shutdown" in listener.lower():
-            ttsgen("Goodbye")
-            exit()
-        if "time is it" in listener.lower():
-            time = "%H:%M"
-            time = f"{strftime(time, localtime())}"
-            print(f"thursday > {time}")
-            ttsgen(time)
-        else:
-            config = configparser.ConfigParser()
-            config.read('config.properties')
-            r = requests.post(config.get("address", "address"), listener)
-            response = r.text
-            if response != "":
-                print(f"thursday > {response}")
-                ttsgen(response)
-            else:
-                text = "Sorry, my AI response server is offline right now. Please try again later"
-                ttsgen(text)
+        match listener:
+            case [*_, "shutdown", *_]:
+                ttsgen("Goodbye")
                 exit()
+            case [*_, "time", *_]:
+                time = "%H:%M"
+                time = f"{strftime(time, localtime())}"
+                print(f"thursday > {time}")
+                ttsgen(time)
+            case _:
+                request(listener)
+
+
+if __name__ == "__main__":
+    main()
