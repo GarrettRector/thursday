@@ -11,10 +11,13 @@ def get_data():
         chat_log = file.read()
     while True:
         answer = ask(question, chat_log)
-        if answer == "":
-            pass
-        else:
-            break
+        match answer:
+            case "":
+                pass
+            case "KEYERR":
+                return "KEYERR"
+            case _:
+                break
     append_chat_log(question, answer, chat_log)
     return Response(answer)
 

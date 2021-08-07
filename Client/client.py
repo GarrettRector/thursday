@@ -14,34 +14,33 @@ recognize = speech_recognition.Recognizer()
 
 
 def listen(recognizer):
+    check = False
     try:
         with speech_recognition.Microphone() as mic:
             audio = recognizer.listen(mic)
             tts = recognizer.recognize_google(audio)
             print(f"You > {tts}")
+            check = True
     # exception handling for tts errors
     except speech_recognition.UnknownValueError:
-        texttospeech("valerr")
-        return None
+        texttospeech("valerr", 0)
     except speech_recognition.RequestError:
-        texttospeech("down")
-        return None
+        texttospeech("down", 0)
     except http.client.IncompleteRead:
-        texttospeech("inc")
-        return None
-    return tts
+        texttospeech("inc", 0)
+    return tts if check else None
 
 
-def texttospeech(name):
-    path = f"tts/{name}.mp3"
-    playsound(os.path.abspath(path), True)
-
-
-def ttsgen(texts):
-    fil = gTTS(text=texts, lang="en", slow=False)
-    fil.save(f"response.mp3")
-    playsound(f"response.mp3")
-    os.remove(f"response.mp3")
+def texttospeech(text, types):
+    match types:
+        case 1:
+            path = f"tts/{text}.mp3"
+            playsound(os.path.abspath(path), True)
+        case 0:
+            fil = gTTS(text=text, lang="en", slow=False)
+            fil.save(f"response.mp3")
+            playsound(f"response.mp3")
+            os.remove(f"response.mp3")
 
 
 def request(listener):
@@ -49,30 +48,29 @@ def request(listener):
     config.read('config.properties')
     r = requests.post(config.get("address", "address"), listener)
     response = r.text
-    if response != "":
-        print(f"thursday > {response}")
-        ttsgen(response)
-    else:
-        text = "Sorry, my AI response server is offline right now. Please try again later"
-        ttsgen(text)
-        exit()
+    match response:
+        case "":
+            texttospeech("Sorry, my AI response server is offline right now. Please try again later", 1)
+            exit()
+        case "KEYERR":
+            print("Key is invalid")
+            texttospeech("Key is invalid", 1)
 
 
 # main function
 def main():
     listener = listen(recognize)
     if listener is not None:
-        match listener:
-            case [*_, "shutdown", *_]:
-                ttsgen("Goodbye")
-                exit()
-            case [*_, "time", *_]:
-                time = "%H:%M"
-                time = f"{strftime(time, localtime())}"
-                print(f"thursday > {time}")
-                ttsgen(time)
-            case _:
-                request(listener)
+        if "shutdown" in listener:
+            texttospeech("Goodbye", 1)
+            exit()
+        elif "time" in listener:
+            time = "%H:%M"
+            time = f"{strftime(time, localtime())}"
+            print(f"thursday > {time}")
+            texttospeech(time, 1)
+        else:
+            request(listener)
 
 
 if __name__ == "__main__":
