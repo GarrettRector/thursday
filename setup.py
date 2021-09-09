@@ -1,3 +1,6 @@
+import app
+import client
+
 inp = input("OpenAI Key > ")
 with open("FlaskServer/key.properties", "w") as file:
     file.write(f"[key]=\nkey = {inp}")
@@ -6,9 +9,8 @@ inp = input()
 while True:
     match inp.lower():
         case "y":
-            # to be completed
-            print("Running of chatbot still in developement")
-            break
+            app.app.run()
+            client.main()
         case "n":
             exit()
         case _:
